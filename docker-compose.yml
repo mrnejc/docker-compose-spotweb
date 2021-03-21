@@ -1,9 +1,4 @@
 version: '3.1'
-# HOWTO:
-# create mysql/mariadb docker volume:
-# $ docker volume create spotweb-db
-# should be in nuc:/data/docker/volumes/spotweb-db/
-# 
 
 volumes:
   spotweb-db:
