@@ -1,0 +1,62 @@
+version: '3.1'
+# HOWTO:
+# create mysql/mariadb docker volume:
+# $ docker volume create spotweb-db
+# should be in nuc:/data/docker/volumes/spotweb-db/
+# 
+
+volumes:
+  spotweb-db:
+    external: true
+
+networks:
+  spotweb:
+
+services:
+  db:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root-password
+      MYSQL_DATABASE: spotweb
+      MYSQL_USER: spotweb
+      MYSQL_PASSWORD: spotweb
+    volumes:
+      - spotweb-db:/var/lib/mysql
+    networks:
+      - spotweb
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 9081:8080
+    networks:
+      - spotweb
+    depends_on:
+      - db
+
+  php:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    volumes:
+      - ./spotweb-src:/opt/spotweb
+    expose:
+      - 9000
+    networks:
+      - spotweb
+    restart: unless-stopped
+
+  spotweb:
+    image: nginx:alpine
+    ports:
+      - 9080:80
+    volumes:
+      - ./nginx-conf:/etc/nginx/conf.d
+      - ./spotweb-src:/opt/spotweb
+    networks:
+      - spotweb
+    restart: unless-stopped
