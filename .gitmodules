@@ -1,0 +1,3 @@
+[submodule "spotweb-src"]
+	path = spotweb-src
+	url = https://github.com/spotweb/spotweb
